@@ -2,986 +2,1050 @@
 <html lang="th">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <title>เบิกยา</title>
-  <style>
-    /* theme.css */
-    :root {
-      --main-color: #6b8e23;
-      --main-light: #eef4e1;
-      --bg: #f4f6f8;
-      --danger: #d9534f;
-      --font-size: 16px;
-    }
-
-    * {
-      font-size: inherit;
-    }
-
-    body {
-      font-family: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
-      font-weight: 400;
-      background: #f5f6fa;
-      margin: 0;
-      font-size: var(--font-size);
-    }
-
-    .text-small {
-      font-size: 13px;
-      font-weight: 300;
-    }
-
-    .header {
-      display: flex;
-      align-items: center;
-      /* 🔥 จัดกลางแนวตั้ง */
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      background: white;
-      color: var(--main-color);
-      padding: 15px;
-      font-weight: 600;
-      border-bottom: 1px solid #ddd;
-      z-index: 100;
-    }
-
-    .header>div:first-child {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .container {
-      padding: 10px;
-      padding-bottom: 80px;
-    }
-
-    .card {
-      background: white;
-      padding: 1em;
-      border-radius: 1em;
-      margin-bottom: 14px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-      transition: all 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .card.pending {
-      border: 2px solid #ffcc00;
-    }
-
-    .card:active {
-      transform: scale(0.96);
-    }
-
-    .btn:active {
-      transform: scale(0.97);
-    }
-
-    .item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    input {
-      width: 80px;
-      height: 44px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      text-align: center;
-      font-size: 1.2em;
-    }
-
-    .cart {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      padding: 14px;
-      border-top: 1px solid #ddd;
-      cursor: pointer;
-      padding-bottom: calc(14px + env(safe-area-inset-bottom));
-    }
-
-    .cart:active {
-      background: #f0f0f0;
-    }
-
-    .cart.has-item {
-      background: var(--main-color);
-      color: white;
-    }
-
-    .cart-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-    }
-
-    .cart-item {
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    .cart-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .cart-left {
-      font-size: 0.8em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .cart-center {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-weight: bold;
-      color: var(--main-color);
-    }
-
-    .cart-left-info {
-      font-size: 1em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: bold;
-    }
-
-    .cart-label {
-      color: var(--main-color);
-    }
-
-    .cart-right-info {
-      font-size: 1em;
-    }
-
-    .cart-tabs {
-      display: flex;
-      background: #eee;
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 10px;
-    }
-
-    #cartModal {
-      max-height: 80vh;
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .cart-list {
-      flex: 1;
-      overflow-y: auto;
-      margin-top: 10px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .cart-list::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .cart-list::-webkit-scrollbar-thumb {
-      background: #ccc;
-      border-radius: 10px;
-    }
-
-    .cart.has-item .cart-center {
-      color: white;
-      letter-spacing: 0.5px;
-      animation: pulse 0.6s;
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: translateX(-50%) scale(1);
-      }
-
-      50% {
-        transform: translateX(-50%) scale(1.1);
-      }
-
-      100% {
-        transform: translateX(-50%) scale(1);
-      }
-    }
-
-    .tab {
-      flex: 1;
-      text-align: center;
-      padding: 8px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .tab.active {
-      background: white;
-      color: var(--main-color);
-    }
-
-    .remove-btn {
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .cart-right {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .cart-right button {
-      width: 2.5em;
-      height: 2.5em;
-      font-size: 1em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background: white;
-      cursor: pointer;
-    }
-
-    .cart-right button:active {
-      transform: scale(0.9);
-    }
-
-    .qty {
-      min-width: 120px;
-      /* 🔥 ล็อกพื้นที่ */
-      text-align: center;
-      font-weight: bold;
-      text-align: center;
-      font-weight: bold;
-      font-variant-numeric: tabular-nums;
-      font-size: 1.2em;
-    }
-
-    .btn {
-      padding: 14px;
-      background: var(--main-color);
-      color: white;
-      text-align: center;
-      border-radius: 10px;
-      margin-top: 8px;
-      font-weight: 600;
-    }
-
-    .type-btn {
-      background: var(--main-light);
-      color: var(--main-color);
-      padding: 14px;
-      border-radius: 16px;
-      margin-bottom: 10px;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .flex-between {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .mt-20 {
-      margin-top: 20px;
-    }
-
-    .text-small {
-      font-size: 0.8em;
-      color: #666;
-    }
-
-    /* overlay */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(4px);
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.3s;
-      z-index: 998;
-    }
-
-    .overlay.show {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .custom-alert {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      backdrop-filter: blur(6px);
-      transition: 0.25s ease;
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.2s;
-    }
-
-    .custom-alert.show {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .alert-box {
-      font-size: 1em;
-      background: white;
-      padding: 20px;
-      border-radius: 16px;
-      width: 80%;
-      max-width: 300px;
-      text-align: center;
-      animation: popupIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    @keyframes popupIn {
-      0% {
-        transform: scale(0.85) translateY(20px);
-        opacity: 0;
-      }
-
-      60% {
-        transform: scale(1.05) translateY(-5px);
-        opacity: 1;
-      }
-
-      100% {
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    .alert-text {
-      margin-bottom: 1em;
-      font-size: 1em;
-      white-space: normal;
-      line-height: 1.6;
-    }
-
-    .alert-box button {
-      background: var(--main-color);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      border-radius: 10px;
-      font-weight: bold;
-      transition: all 0.2s ease;
-    }
-
-    .alert-box button:active {
-      transform: scale(0.92);
-    }
-
-    @keyframes scaleIn {
-      from {
-        transform: scale(0.9);
-        opacity: 0;
-      }
-
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    /* 🔄 Loading Spinner */
-    .loader {
-      width: 48px;
-      height: 48px;
-      border: 4px solid #eee;
-      border-top: 4px solid var(--main-color);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 15px;
-      animation: spin 1s linear infinite, fadeIn 0.3s ease;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .font-btn {
-      border: none;
-      background: var(--main-light);
-      color: var(--main-color);
-      padding: 6px 10px;
-      margin-left: 4px;
-      border-radius: 8px;
-      font-weight: bold;
-    }
-
-    button,
-    input,
-    div,
-    span {
-      font-size: inherit;
-    }
-
-    .count-text {
-      margin-top: 2px;
-      font-size: 0.8em;
-      color: #888;
-    }
-
-    .alert-icon {
-      font-size: 2em;
-      margin-bottom: 10px;
-      animation: shake 0.4s ease;
-    }
-
-    @keyframes shake {
-      0% {
-        transform: rotate(0);
-      }
-
-      25% {
-        transform: rotate(-10deg);
-      }
-
-      50% {
-        transform: rotate(10deg);
-      }
-
-      75% {
-        transform: rotate(-5deg);
-      }
-
-      100% {
-        transform: rotate(0);
-      }
-    }
-
-    @keyframes popupOut {
-      from {
-        transform: scale(1);
-        opacity: 1;
-      }
-
-      to {
-        transform: scale(0.9);
-        opacity: 0;
-      }
-    }
-
-    .save-loading {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      backdrop-filter: blur(4px);
-    }
-
-    .save-loading-text {
-      margin-top: 10px;
-      font-weight: 600;
-      color: var(--main-color);
-      font-size: 1.1em;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>เบิกยา</title>
+    <style>
+        /* ===================== */
+        /* 🎨 THEME */
+        /* ===================== */
+        :root {
+            --main-color: #6b8e23;
+            --main-light: #eef4e1;
+            --bg: #f4f6f8;
+            --danger: #d9534f;
+            --font-size: 16px;
+            --content-font: 16px;
+        }
+
+        /* ===================== */
+        /* 🔧 RESET */
+        /* ===================== */
+        * {
+            font-size: inherit;
+        }
+
+        body {
+            font-family: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f6fa;
+            margin: 0;
+        }
+
+        /* ===================== */
+        /* 🧱 LAYOUT */
+        /* ===================== */
+
+        .header {
+            display: flex;
+            align-items: center;
+            /* 🔥 จัดกลางแนวตั้ง */
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: white;
+            color: var(--main-color);
+            padding: 12px 14px;
+            font-size: clamp(12px, 4vw, 20px);
+            font-weight: 600;
+            border-bottom: 1px solid #ddd;
+            z-index: 100;
+        }
+
+        .header>div:first-child {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            padding: 10px;
+            padding-bottom: 80px;
+            font-size: var(--content-font);
+        }
+
+        .card {
+            background: white;
+            padding: 1em;
+            border-radius: 1em;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .card.pending {
+            border: 2px solid #ffcc00;
+        }
+
+        .card:active {
+            transform: scale(0.96);
+        }
+
+        /* ===================== */
+        /* 🧩 COMPONENT */
+        /* ===================== */
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        input {
+            width: 80px;
+            height: 44px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        .cart {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 14px;
+            border-top: 1px solid #ddd;
+            cursor: pointer;
+            padding-bottom: calc(14px + env(safe-area-inset-bottom));
+            font-size: clamp(14px, 4vw, 16px);
+        }
+
+        .cart-modal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 15px;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            max-height: 70%;
+            overflow: auto;
+            transform: translateY(100%);
+            transition: 0.3s;
+            z-index: 999;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart:active {
+            background: #f0f0f0;
+        }
+
+        .cart.has-item {
+            background: var(--main-color);
+            color: white;
+        }
+
+        .cart-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .cart-left-info,
+        .cart-right-info {
+            font-size: 14px;
+        }
+
+        .cart-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-row {
+            display: flex;
+            flex: 1;
+            font-size: 15px;
+            line-height: 1.4;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+        }
+
+        /* 🔥 ปุ่ม X */
+        .cart-remove {
+            width: 40px;
+            text-align: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .cart-remove:active {
+            transform: scale(0.8);
+            opacity: 0.6;
+        }
+
+        .cart-left {
+            flex: 1;
+            min-width: 0;
+            font-size: 15px;
+            line-height: 1.4;
+            max-width: 50%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--main-color);
+        }
+
+        .cart-left-info {
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+
+        .cart-label {
+            color: var(--main-color);
+        }
+
+        .cart-right-info {
+            font-size: 1em;
+        }
+
+        .cart-tabs {
+            display: flex;
+            background: #eee;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 10px;
+        }
+
+        #cartModal {
+            max-height: 80vh;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .cart-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cart-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .cart-list::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .cart.has-item .cart-center {
+            color: white;
+            letter-spacing: 0.5px;
+            animation: pulse 0.6s;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            background: white;
+            color: var(--main-color);
+        }
+
+        .remove-btn {
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .cart-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-right button {
+            width: 44px;
+            height: 44px;
+            font-size: 18px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ccc;
+            background: white;
+            cursor: pointer;
+        }
+
+        .cart-right button:active {
+            transform: scale(0.9);
+            background: var(--main-light);
+        }
+
+        .qty {
+            min-width: 90px;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            font-weight: bold;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            transition: 0.15s;
+        }
+
+        .btn {
+            padding: 14px;
+            background: var(--main-color);
+            color: white;
+            text-align: center;
+            border-radius: 10px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .type-btn {
+            background: var(--main-light);
+            color: var(--main-color);
+            padding: 14px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            z-index: 998;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .custom-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(6px);
+            transition: 0.25s ease;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s;
+        }
+
+        .custom-alert.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .alert-box {
+            font-size: 1em;
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+            animation: popupIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .alert-text {
+            margin-bottom: 1em;
+            font-size: 1em;
+            white-space: normal;
+            line-height: 1.6;
+        }
+
+        .alert-box button {
+            background: var(--main-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .alert-box button:active {
+            transform: scale(0.92);
+        }
+
+        /* 🔄 Loading Spinner */
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #eee;
+            border-top: 4px solid var(--main-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+            animation: spin 1s linear infinite, fadeIn 0.3s ease;
+        }
+
+        .font-btn {
+            border: none;
+            background: var(--main-light);
+            color: var(--main-color);
+            font-size: clamp(12px, 3vw, 14px);
+            padding: 6px 10px;
+            margin-left: 4px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        button,
+        input,
+        div,
+        span {
+            font-size: inherit;
+        }
+
+        .count-text {
+            margin-top: 2px;
+            font-size: 0.8em;
+            color: #888;
+            font-size: clamp(12px, 3vw, 14px);
+        }
+
+        .alert-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            animation: shake 0.4s ease;
+        }
+
+        .save-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(4px);
+        }
+
+        .save-loading-text {
+            margin-top: 10px;
+            font-weight: 600;
+            color: var(--main-color);
+            font-size: 1.1em;
+        }
+
+        /* 🔥 ล็อกฟ้อนเฉพาะตะกร้า */
+        #cartModal,
+        #cartModal * {
+            font-size: 16px !important;
+        }
+
+        .modal-handle {
+            width: 40px;
+            height: 4px;
+            background: #ccc;
+            border-radius: 10px;
+            margin: 0 auto 10px;
+        }
+        
+        /* ===================== */
+        /* 🎬 ANIMATION */
+        /* ===================== */
+        @keyframes shake {
+            0% {
+                transform: rotate(0);
+            }
+
+            25% {
+                transform: rotate(-10deg);
+            }
+
+            50% {
+                transform: rotate(10deg);
+            }
+
+            75% {
+                transform: rotate(-5deg);
+            }
+
+            100% {
+                transform: rotate(0);
+            }
+        }
+
+        @keyframes popupOut {
+            from {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            to {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes popupIn {
+            0% {
+                transform: scale(0.85) translateY(20px);
+                opacity: 0;
+            }
+
+            60% {
+                transform: scale(1.05) translateY(-5px);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+
+            50% {
+                transform: translateX(-50%) scale(1.1);
+            }
+
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        /* ===================== */
+        /* 📱 UTIL */
+        /* ===================== */
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .text-small {
+            font-size: 0.8em;
+            color: #666;
+            font-weight: 300;
+        }
+    </style>
 </head>
 
 <body>
 
-  <div class="header">
-    <div>📦 เบิกยา</div>
-    <div class="count-text" id="count"></div>
-    <div>
-      <button class="font-btn" onclick="changeFont(-1)">A-</button>
-      <button class="font-btn" onclick="changeFont(1)">A+</button>
-    </div>
-  </div>
-
-  <div class="container">
-    <div id="list"></div>
-  </div>
-
-  <div class="cart" onclick="openCart()">
-    <div class="cart-bar">
-
-      <div class="cart-left-info">
-        🛒 <b id="reqCount">0</b>
-      </div>
-
-      <div class="cart-center">
-        เปิดตะกร้า
-      </div>
-
-      <div class="cart-right-info">
-        🚫 <b id="skipCount">0</b>
-      </div>
-
-    </div>
-  </div>
-
-  <div id="cartModal" onclick="event.stopPropagation()" style="
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:white;
-  border-radius:20px 20px 0 0;
-  padding:15px;
-  height: 70vh;
-  display: flex;
-  flex-direction: column;
-  max-height:70%;
-  overflow:auto;
-  transform:translateY(100%);
-  transition:0.3s;
-  z-index:999;
-  box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-">
-
-    <div style="
-    width:40px;
-    height:4px;
-    background:#ccc;
-    border-radius:10px;
-    margin:0 auto 10px;
-  "></div>
-
-    <h3>🛒 ตะกร้า (<span id="totalCount">0</span> รายการ)</h3>
-
-    <div class="cart-tabs">
-      <div class="tab active" onclick="switchTab('request')">เบิกยา</div>
-      <div class="tab" onclick="switchTab('skip')">ไม่เบิก</div>
+    <div class="header">
+        <div>📦 เบิกยา</div>
+        <div class="count-text" id="count"></div>
+        <div>
+            <button class="font-btn" onclick="changeFont(-1)">A-</button>
+            <button class="font-btn" onclick="changeFont(1)">A+</button>
+        </div>
     </div>
 
-    <div id="cartList" class="cart-list"></div>
-
-    <div class="btn" onclick="submitData()">บันทึก</div>
-
-  </div>
-
-  <div id="overlay" class="overlay" onclick="closeCart()"></div>
-
-  <div id="customAlert" class="custom-alert">
-    <div class="alert-box">
-      <div class="alert-text" id="alertText">⚠️ ข้อความ</div>
-      <button onclick="closeAlert()">ตกลง</button>
+    <div class="container">
+        <div id="list"></div>
     </div>
-  </div>
 
-  <script>
+    <div class="cart" onclick="openCart()">
+        <div class="cart-bar">
 
-    // =====================
-    // 🌐 CONFIG
-    // =====================
-    const API_URL = "https://script.google.com/macros/s/AKfycbyOl11s8-Yo-rfz3Xzs-GdRi4M60ubn5SNrhG9C6uvzCyAOqRbeV8MIX3ztidXxGRk/exec";
+            <div class="cart-left-info">
+                🛒 <b id="reqCount">0</b>
+            </div>
+
+            <div class="cart-center">
+                เปิดตะกร้า
+            </div>
+
+            <div class="cart-right-info">
+                🚫 <b id="skipCount">0</b>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="cartModal" class="cart-modal" onclick="event.stopPropagation()">
+
+        <div class="modal-handle"></div>
+
+        <h3>🛒 ตะกร้า (<span id="totalCount">0</span> รายการ)</h3>
+
+        <div class="cart-tabs">
+            <div class="tab active" onclick="switchTab('request')">เบิกยา</div>
+            <div class="tab" onclick="switchTab('skip')">ไม่เบิก</div>
+        </div>
+
+        <div id="cartList" class="cart-list"></div>
+
+        <div class="btn" onclick="submitData()">บันทึก</div>
+
+    </div>
+
+    <div id="overlay" class="overlay" onclick="closeCart()"></div>
+
+    <div id="customAlert" class="custom-alert">
+        <div class="alert-box">
+            <div class="alert-text" id="alertText">⚠️ ข้อความ</div>
+            <button onclick="closeAlert()">ตกลง</button>
+        </div>
+    </div>
+
+    <script>
+
+        // =====================
+        // 🌐 CONFIG
+        // =====================
+        const API_URL = "https://script.google.com/macros/s/AKfycbyOl11s8-Yo-rfz3Xzs-GdRi4M60ubn5SNrhG9C6uvzCyAOqRbeV8MIX3ztidXxGRk/exec";
 
 
-    // =====================
-    // 🧠 STATE
-    // =====================
-    let mainList = [];
-    let requestCart = [];
-    let skipCart = [];
-    let userId = "";
-    let currentType = null;
-    let currentCartTab = "request"; // request | skip
-    let holdTimeout = null;
-    let holdInterval = null;
-    let holdSpeed = 100; // เริ่มช้า
-    let orderMap = {}; // 🔥 เพิ่มบรรทัดนี้
-    let isSaving = false;
-    let fontSize = parseInt(localStorage.getItem("fontSize")) || 16;
-    applyFontSize();
+        // =====================
+        // 🧠 STATE
+        // =====================
+        let mainList = [];
+        let requestCart = [];
+        let skipCart = [];
+        let userId = "";
+        let currentType = null;
+        let currentCartTab = "request"; // request | skip
+        let isTouch = false;
+        let holdTimeout = null;
+        let holdInterval = null;
+        let holdSpeed = 100; // เริ่มช้า
+        let orderMap = {}; // 🔥 เพิ่มบรรทัดนี้
+        let isSaving = false;
+        let fontSize = parseInt(localStorage.getItem("fontSize")) || 16;
+        applyFontSize();
 
-    // =====================
-    // 🚀 INIT
-    // =====================
-    function init() {
-      showTypeSelector();
-      // initLIFF(); // เปิดตอนใช้จริง
-    }
-
-
-    // =====================
-    // 🔐 LIFF (ใช้ตอน production)
-    // =====================
-    async function initLIFF() {
-      await liff.init({ liffId: "YOUR_LIFF_ID" });
-
-      if (!liff.isLoggedIn()) {
-        liff.login();
-      }
-
-      const profile = await liff.getProfile();
-      userId = profile.userId;
-    }
+        // =====================
+        // 🚀 INIT
+        // =====================
+        function init() {
+            showTypeSelector();
+            // initLIFF(); // เปิดตอนใช้จริง
+        }
 
 
-    // =====================
-    // 📦 LOAD DATA
-    // =====================
-    async function loadData(type) {
-      showLoading();
-      try {
-        const res = await fetch(`${API_URL}?action=getMedicine&type=${type}`);
-        const data = await res.json();
+        // =====================
+        // 🔐 LIFF (ใช้ตอน production)
+        // =====================
+        async function initLIFF() {
+            await liff.init({ liffId: "YOUR_LIFF_ID" });
 
-        // 🔥 เอา id ที่อยู่ใน cart ทั้งหมด
-        const usedIds = [
-          ...requestCart.map(i => i.id),
-          ...skipCart.map(i => i.id)
-        ];
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            }
 
-        // 🔥 filter ออก
-        orderMap = {}; // 🔥 reset ทุกครั้ง
+            const profile = await liff.getProfile();
+            userId = profile.userId;
+        }
 
-        mainList = data
-          .map((item, index) => {
-            orderMap[item.id] = index; // 🔥 เก็บ order จริง
-            return {
-              ...item,
-              type: type,
-              order: index
-            };
-          })
-          .filter(item => !usedIds.includes(item.id));
-        renderList();
 
-      } catch (err) {
-        console.error(err);
-        showAlert("⚠️ โหลดข้อมูลไม่สำเร็จ");
-      }
-    }
+        // =====================
+        // 📦 LOAD DATA
+        // =====================
+        async function loadData(type) {
+            showLoading();
+            try {
+                const res = await fetch(`${API_URL}?action=getMedicine&type=${type}`);
+                const data = await res.json();
 
-    // =====================
-    // 🧩 UI: เลือกประเภท
-    // =====================
-    function showTypeSelector() {
-      const list = document.getElementById("list");
+                // 🔥 เอา id ที่อยู่ใน cart ทั้งหมด
+                const usedIds = [
+                    ...requestCart.map(i => i.id),
+                    ...skipCart.map(i => i.id)
+                ];
 
-      list.innerHTML = `
+                // 🔥 filter ออก
+                orderMap = {}; // 🔥 reset ทุกครั้ง
+
+                mainList = data
+                    .map((item, index) => {
+                        orderMap[item.id] = index; // 🔥 เก็บ order จริง
+                        return {
+                            ...item,
+                            type: type,
+                            order: index
+                        };
+                    })
+                    .filter(item => !usedIds.includes(item.id));
+                renderList();
+
+            } catch (err) {
+                console.error(err);
+                showAlert("⚠️ โหลดข้อมูลไม่สำเร็จ");
+            }
+        }
+
+        // =====================
+        // 🧩 UI: เลือกประเภท
+        // =====================
+        function showTypeSelector() {
+            const list = document.getElementById("list");
+
+            list.innerHTML = `
         <div style="margin-top:20px;">
           <div class="btn" onclick="selectType('tablet')">💊 ยาเม็ด</div>
           <div class="btn" onclick="selectType('liquid')">💉 ยาน้ำ / ยาฉีด</div>
         </div>
       `;
 
-      document.getElementById("count").innerText = "เลือกประเภทยา";
-    }
-
-
-    // =====================
-    // 🎯 เลือกประเภท
-    // =====================
-    function selectType(type) {
-
-      // 🔥 ถ้ามีของในตะกร้า
-      if (requestCart.length > 0 || skipCart.length > 0) {
-
-        // 👉 เอาประเภทจาก item แรกใน cart
-        const cartType =
-          requestCart[0]?.type ||
-          skipCart[0]?.type;
-
-        // ❌ ถ้าคนละประเภท → ห้ามเข้า
-        if (cartType !== type) {
-          showAlert("⚠️ ไม่สามารถเปลี่ยนประเภทยาได้\nเนื่องจากมีรายการในตะกร้า");
-          return;
+            document.getElementById("count").innerText = "เลือกประเภทยา";
         }
 
-        // ✅ ถ้าเป็นประเภทเดียวกัน → เข้าได้เลย
-      }
 
-      currentType = type;
-      loadData(type);
-    }
+        // =====================
+        // 🎯 เลือกประเภท
+        // =====================
+        function selectType(type) {
+
+            // 🔥 ถ้ามีของในตะกร้า
+            if (requestCart.length > 0 || skipCart.length > 0) {
+
+                // 👉 เอาประเภทจาก item แรกใน cart
+                const cartType =
+                    requestCart[0]?.type ||
+                    skipCart[0]?.type;
+
+                // ❌ ถ้าคนละประเภท → ห้ามเข้า
+                if (cartType !== type) {
+                    showAlert("⚠️ ไม่สามารถเปลี่ยนประเภทยาได้\nเนื่องจากมีรายการในตะกร้า");
+                    return;
+                }
+
+                // ✅ ถ้าเป็นประเภทเดียวกัน → เข้าได้เลย
+            }
+
+            currentType = type;
+            loadData(type);
+        }
 
 
-    // =====================
-    // 🧾 RENDER LIST
-    // =====================
-    function renderList() {
-      const list = document.getElementById("list");
+        // =====================
+        // 🧾 RENDER LIST
+        // =====================
+        function renderList() {
+            const list = document.getElementById("list");
 
-      list.innerHTML = "";
+            list.innerHTML = "";
 
-      document.getElementById("count").innerText = `(เหลือ ${mainList.length} รายการ)`;
+            document.getElementById("count").innerText = `(เหลือ ${mainList.length} รายการ)`;
 
-      mainList.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "card";
-        div.id = "card-" + item.id;
+            mainList.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "card";
+                div.id = "card-" + item.id;
 
-        div.innerHTML = `
+                div.innerHTML = `
           <div class="item">
             <div>
               <div><b>${item.name}</b></div>
               <div class="text-small">
-                หน่วย: ${item.unit} | ใช้: ${item.rate}
+                หน่วย/กล่อง ${item.unit} | อัตราการใช้ ${item.rate}
               </div>
             </div>
             <input 
   type="number" 
   inputmode="numeric" 
   pattern="[0-9]*"
-  min="0" 
+  value=""
   placeholder="0"
   onblur="handleInput(this, '${item.id}')">
           </div>
         `;
 
-        list.appendChild(div);
-      });
+                list.appendChild(div);
+            });
 
-      updateCartCount();
-    }
-
-
-    // =====================
-    // ✏️ HANDLE INPUT
-    // =====================
-    function handleInput(input, id) {
-
-      // 🚫 กันกดซ้ำ
-      if (requestCart.some(i => i.id == id)) return;
-      if (skipCart.some(i => i.id == id)) return;
-      // ✅ ถ้ายังไม่กรอกอะไร → ไม่ต้องทำอะไร
-      if (input.value === "") return;
-
-      const value = parseInt(input.value);
-
-      if (isNaN(value)) {
-        showAlert("⚠️ กรุณากรอกตัวเลข");
-        return;
-      }
-
-      if (value < 0) {
-        showAlert("⚠️ รายการเบิกห้ามติดลบ");
-        return;
-      }
-
-      const index = mainList.findIndex(item => item.id == id);
-      if (index === -1) return;
-
-      const item = mainList[index];
-
-      if (value > 0) {
-        requestCart.push({ ...item, qty: value });
-        localStorage.setItem("requestCart", JSON.stringify(requestCart));
-      } else {
-        skipCart.push({ ...item, qty: 0 });
-        localStorage.setItem("skipCart", JSON.stringify(skipCart));
-      }
-
-      // ลบจาก list data
-      mainList.splice(index, 1);
-
-      // 🔥 ลบเฉพาะ DOM ตัวนี้
-      const card = document.getElementById("card-" + id);
-      if (card) {
-        card.style.opacity = "0";
-        card.style.transform = "scale(0.8)";
-        card.style.filter = "blur(2px)";
-
-        setTimeout(() => {
-          card.remove();
-        }, 150);
-      }
-
-      // update count
-      document.getElementById("count").innerText = `(เหลือ ${mainList.length} รายการ)`;
-
-      updateCartCount();
-    }
-
-
-    // =====================
-    // 🛒 UPDATE CART
-    // =====================
-    function updateCartCount() {
-      const cart = document.querySelector(".cart");
-
-      document.getElementById("reqCount").innerText = requestCart.length;
-      document.getElementById("skipCount").innerText = skipCart.length;
-
-      if (requestCart.length > 0) {
-        cart.classList.add("has-item");
-      } else {
-        cart.classList.remove("has-item");
-      }
-    }
-
-    function switchTab(type) {
-      currentCartTab = type;
-
-      // เปลี่ยน active tab
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      event.target.classList.add("active");
-
-      renderCart();
-    }
-
-    // =====================
-    // 💾 SUBMIT
-    // =====================
-    async function submitData() {
-
-      // 🚫 กันกดซ้ำ
-      if (isSaving) return;
-      isSaving = true;
-
-      if (mainList.length > 0) {
-        showAlert("⚠️ ยังกรอกรายการเบิกยาไม่ครบ\nไม่เบิกให้ใส่ 0");
-        isSaving = false;
-        return;
-      }
-
-      try {
-        showSaveLoading(); // 🔥 แสดง loading
-
-        const payload = {
-          action: "saveRequest",
-          userId: userId,
-          type: currentType,
-          request: requestCart,
-          skip: skipCart
-        };
-
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/plain" // 🔥 กัน CORS
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await res.json();
-
-        console.log("RESULT:", result);
-
-        hideSaveLoading(); // 🔥 ซ่อน loading
-
-        if (result.status !== "success") {
-          showAlert("❌ บันทึกไม่สำเร็จ\n" + (result.message || ""));
-          isSaving = false;
-          return;
+            updateCartCount();
         }
 
-        // ✅ สำเร็จ
-        showAlert("✅ บันทึกสำเร็จ");
 
-        closeCart();
+        // =====================
+        // ✏️ HANDLE INPUT
+        // =====================
+        function handleInput(input, id) {
 
-        requestCart = [];
-        skipCart = [];
+            // 🚫 กันกดซ้ำ
+            if (requestCart.some(i => i.id == id)) return;
+            if (skipCart.some(i => i.id == id)) return;
+            // ✅ ถ้ายังไม่กรอกอะไร → ไม่ต้องทำอะไร
+            if (input.value === "") return;
 
-        localStorage.removeItem("requestCart");
-        localStorage.removeItem("skipCart");
+            const value = parseInt(input.value);
 
-        updateCartCount();
+            if (isNaN(value)) {
+                showAlert("⚠️ กรุณากรอกตัวเลข");
+                return;
+            }
 
-        setTimeout(() => {
-          showTypeSelector();
-        }, 300);
+            if (value < 0) {
+                showAlert("⚠️ รายการเบิกห้ามติดลบ");
+                return;
+            }
 
-      } catch (err) {
-        console.error(err);
+            const index = mainList.findIndex(item => item.id == id);
+            if (index === -1) return;
 
-        hideSaveLoading(); // 🔥 ต้องซ่อนแม้ error
-        showAlert("⚠️ บันทึกไม่สำเร็จ (network error)");
-      }
+            const item = mainList[index];
 
-      isSaving = false; // 🔓 ปลดล็อก
-    }
+            if (value > 0) {
+                requestCart.push({ ...item, qty: value });
+                localStorage.setItem("requestCart", JSON.stringify(requestCart));
+            } else {
+                skipCart.push({ ...item, qty: 0 });
+                localStorage.setItem("skipCart", JSON.stringify(skipCart));
+            }
 
-    function openCart() {
+            // ลบจาก list data
+            mainList.splice(index, 1);
 
-      stopHold(); // 🔥 เคลียร์ก่อนทุกครั้ง
+            // 🔥 ลบเฉพาะ DOM ตัวนี้
+            const card = document.getElementById("card-" + id);
+            if (card) {
+                card.style.opacity = "0";
+                card.style.transform = "scale(0.8)";
+                card.style.filter = "blur(2px)";
 
-      const modal = document.getElementById("cartModal");
-      const overlay = document.getElementById("overlay");
+                setTimeout(() => {
+                    card.remove();
+                }, 150);
+            }
 
-      renderCart();
+            // update count
+            document.getElementById("count").innerText = `(เหลือ ${mainList.length} รายการ)`;
 
-      modal.style.transform = "translateY(0)";
-      overlay.classList.add("show");
-    }
+            updateCartCount();
+        }
 
-    function closeCart() {
-      const modal = document.getElementById("cartModal");
-      const overlay = document.getElementById("overlay");
 
-      modal.style.transform = "translateY(100%)";
-      overlay.classList.remove("show");
-    }
+        // =====================
+        // 🛒 UPDATE CART
+        // =====================
+        function updateCartCount() {
+            const cart = document.querySelector(".cart");
 
-    function renderCart() {
-      const list = document.getElementById("cartList");
-      list.innerHTML = "";
+            document.getElementById("reqCount").innerText = requestCart.length;
+            document.getElementById("skipCount").innerText = skipCart.length;
 
-      let data = currentCartTab === "request" ? requestCart : skipCart;
+            if (requestCart.length > 0) {
+                cart.classList.add("has-item");
+            } else {
+                cart.classList.remove("has-item");
+            }
+        }
 
-      // 🔥 เรียงตาม order
-      data = [...data].sort((a, b) => a.order - b.order);
+        function switchTab(type) {
+            currentCartTab = type;
 
-      // 👇 จำนวนรายการ (เอาเฉพาะ requestCart)
-      document.getElementById("totalCount").innerText = requestCart.length;
+            // เปลี่ยน active tab
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+            event.target.classList.add("active");
 
-      data.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "cart-item";
+            renderCart();
+        }
 
-        // 🟢 ฝั่งเบิกยา
-        if (currentCartTab === "request") {
-          div.innerHTML = `
+        // =====================
+        // 💾 SUBMIT
+        // =====================
+        async function submitData() {
+
+            const sortedRequest = [...requestCart].sort((a, b) => a.order - b.order);
+            const sortedSkip = [...skipCart].sort((a, b) => a.order - b.order);
+
+            // 🚫 กันกดซ้ำ
+            if (isSaving) return;
+            isSaving = true;
+
+            if (mainList.length > 0) {
+                showAlert("⚠️ ยังกรอกรายการเบิกยาไม่ครบ\nไม่เบิกให้ใส่ 0");
+                isSaving = false;
+                return;
+            }
+
+            try {
+                showSaveLoading(); // 🔥 แสดง loading
+
+                const payload = {
+                    action: "saveRequest",
+                    userId: userId,
+                    type: currentType,
+                    request: sortedRequest,
+                    skip: sortedSkip
+                };
+
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "text/plain" // 🔥 กัน CORS
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+
+                console.log("RESULT:", result);
+
+                hideSaveLoading(); // 🔥 ซ่อน loading
+
+                if (result.status !== "success") {
+                    showAlert("❌ บันทึกไม่สำเร็จ\n" + (result.message || ""));
+                    isSaving = false;
+                    return;
+                }
+
+                // ✅ สำเร็จ
+                showAlert("✅ บันทึกสำเร็จ");
+
+                closeCart();
+
+                requestCart = [];
+                skipCart = [];
+
+                localStorage.removeItem("requestCart");
+                localStorage.removeItem("skipCart");
+
+                updateCartCount();
+
+                setTimeout(() => {
+                    showTypeSelector();
+                }, 300);
+
+            } catch (err) {
+                console.error(err);
+
+                hideSaveLoading(); // 🔥 ต้องซ่อนแม้ error
+                showAlert("⚠️ บันทึกไม่สำเร็จ (network error)");
+            }
+
+            isSaving = false; // 🔓 ปลดล็อก
+        }
+
+        function openCart() {
+
+            stopHold(); // 🔥 เคลียร์ก่อนทุกครั้ง
+
+            const modal = document.getElementById("cartModal");
+            const overlay = document.getElementById("overlay");
+
+            renderCart();
+
+            modal.style.transform = "translateY(0)";
+            overlay.classList.add("show");
+        }
+
+        function closeCart() {
+            const modal = document.getElementById("cartModal");
+            const overlay = document.getElementById("overlay");
+
+            modal.style.transform = "translateY(100%)";
+            overlay.classList.remove("show");
+        }
+
+        function renderCart() {
+            const list = document.getElementById("cartList");
+            list.innerHTML = "";
+
+            let data = currentCartTab === "request" ? requestCart : skipCart;
+
+            // 🔥 เรียงตาม order
+            data = [...data].sort((a, b) => a.order - b.order);
+
+            // 👇 จำนวนรายการ (เอาเฉพาะ requestCart)
+            document.getElementById("totalCount").innerText = requestCart.length;
+
+            data.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "cart-item";
+
+                // 🟢 ฝั่งเบิกยา
+                if (currentCartTab === "request") {
+                    div.innerHTML = `
             <div class="cart-row">
 
               <div class="cart-left">
                 ${item.name}
-                <span class="remove-btn" onclick="removeFromCart('${item.id}')">❌</span>
-              </div>
+                </div>
+
+                <div class="cart-remove" onclick="removeFromCart('${item.id}')">
+                ❌
+                </div>
 
               <div class="cart-right">   <!-- 🔥 ครอบทั้งหมด -->
                 <button 
-                  onmousedown="startHold('${item.id}', -1)" 
+                  oonmousedown="startHold('${item.id}', -1, event)"
                   onmouseup="stopHold()" 
                   onmouseleave="stopHold()"
-                  ontouchstart="startHold('${item.id}', -1)"
+                  ontouchstart="startHold('${item.id}', -1, event)"
                   ontouchend="stopHold()"
                 >-</button>
 
@@ -990,21 +1054,21 @@
                 </span>
 
                 <button 
-                  onmousedown="startHold('${item.id}', 1)" 
+                  onmousedown="startHold('${item.id}', 1, event)"
                   onmouseup="stopHold()" 
                   onmouseleave="stopHold()"
-                  ontouchstart="startHold('${item.id}', 1)"
+                  ontouchstart="startHold('${item.id}', 1, event)"
                   ontouchend="stopHold()"
                 >+</button>
               </div>
 
             </div>
           `;
-        }
+                }
 
-        // 🔴 ฝั่งไม่เบิก
-        else {
-          div.innerHTML = `
+                // 🔴 ฝั่งไม่เบิก
+                else {
+                    div.innerHTML = `
         <div class="cart-row">
           <div class="cart-left">
             ${item.name}
@@ -1012,183 +1076,179 @@
           </div>
         </div>
       `;
+                }
+
+                list.appendChild(div);
+            });
         }
 
-        list.appendChild(div);
-      });
-    }
+        function startHold(id, delta, e) {
 
-    function startHold(id, delta) {
-      changeQty(id, delta);
+            if (e.type === "touchstart") {
+                isTouch = true;
+            }
 
-      holdSpeed = 100;
+            if (e.type === "mousedown" && isTouch) return;
 
-      holdTimeout = setTimeout(() => {
-        holdInterval = setInterval(() => {
-          changeQty(id, delta);
+            changeQty(id, delta);
 
-          // 🔥 เร่งความเร็ว
-          if (holdSpeed > 30) {
-            holdSpeed -= 10;
+            holdSpeed = 100;
 
+            holdTimeout = setTimeout(() => {
+                holdInterval = setInterval(() => {
+                    changeQty(id, delta);
+                }, holdSpeed);
+            }, 700);
+        }
+
+        function stopHold() {
+            clearTimeout(holdTimeout);
             clearInterval(holdInterval);
-            holdInterval = setInterval(() => {
-              changeQty(id, delta);
-            }, holdSpeed);
-          }
-
-        }, holdSpeed);
-      }, 150); // กดค้าง 0.3 วิค่อยเริ่มรัว
-    }
-
-    function stopHold() {
-      clearTimeout(holdTimeout);
-      clearInterval(holdInterval);
-    }
-
-    function undoSkip(id) {
-
-      const index = skipCart.findIndex(i => i.id == id);
-      if (index === -1) return;
-
-      const item = skipCart[index];
-
-      // 🔥 ลบออกจาก skip
-      skipCart.splice(index, 1);
-      localStorage.setItem("skipCart", JSON.stringify(skipCart));
-
-      // 🔥 คืนกลับ mainList
-      item.order = orderMap[item.id] ?? 9999;
-
-      mainList.push(item);
-      mainList.sort((a, b) => a.order - b.order);
-
-      renderList();     // รีเฟรชหน้าเบิกยา
-      renderCart();     // รีเฟรช modal
-      updateCartCount();
-    }
-
-    function removeFromCart(id) {
-
-      stopHold(); // 🔥 กันค้างซ้ำ
-
-      const index = requestCart.findIndex(i => i.id == id);
-      if (index === -1) return;
-
-      const item = requestCart[index];
-
-      // 🔥 ลบจาก cart
-      requestCart.splice(index, 1);
-      localStorage.setItem("requestCart", JSON.stringify(requestCart));
-
-      item.order = orderMap[item.id] ?? 9999;
-
-      // 🔥 คืนกลับ mainList
-      mainList.push(item);
-
-      const card = document.getElementById("card-" + item.id);
-      if (card) {
-        card.style.transform = "scale(0.95)";
-        setTimeout(() => {
-          card.style.transform = "scale(1)";
-        }, 50);
-      }
-
-      // 🔥 เรียงใหม่ (สำคัญ!)
-      mainList.sort((a, b) => a.order - b.order);
-      renderList();
-      renderCart();
-      updateCartCount();
-    }
-
-    function changeQty(id, delta) {
-      const item = requestCart.find(i => i.id == id);
-      if (!item) return;
-
-      item.qty += delta;
-
-      if (item.qty <= 0) {
-        stopHold();   // 🔥 หยุดการกดค้างทันที
-        removeFromCart(id);
-        return;
-      }
-
-      localStorage.setItem("requestCart", JSON.stringify(requestCart));
-      renderCart();
-    }
-
-    function addItemToList(item) {
-
-      // 🔥 ถ้ายังไม่ได้เลือกประเภท → ไม่ต้องทำ
-      if (!currentType) return;
-
-      const list = document.getElementById("list");
-
-      const div = document.createElement("div");
-      div.className = "card";
-      div.id = "card-" + item.id;
-
-      div.innerHTML = `
-    <div class="item">
-      <div>
-        <div><b>${item.name}</b></div>
-        <div class="text-small">
-          หน่วย: ${item.unit} | ใช้: ${item.rate}
-        </div>
-      </div>
-      <input 
-  type="number" 
-  inputmode="numeric" 
-  pattern="[0-9]*"
-  min="0" 
-  placeholder="0"
-  onblur="handleInput(this, '${item.id}')">
-    </div>
-  `;
-
-      const cards = list.querySelectorAll(".card");
-
-      let inserted = false;
-
-      cards.forEach(card => {
-        const cardId = card.id.replace("card-", "");
-        const cardItem = mainList.find(i => i.id == cardId);
-
-        if (!inserted && cardItem && item.order < cardItem.order) {
-          list.insertBefore(div, card);
-          inserted = true;
         }
-      });
 
-      if (!inserted) {
-        list.appendChild(div);
-      }
+        function undoSkip(id) {
 
-      document.getElementById("count").innerText = `(เหลือ ${mainList.length} รายการ)`;
-    }
+            const index = skipCart.findIndex(i => i.id == id);
+            if (index === -1) return;
 
-    function showAlert(msg) {
-      document.getElementById("alertText").innerHTML = `
+            const item = skipCart[index];
+
+            // 🔥 ลบออกจาก skip
+            skipCart.splice(index, 1);
+            localStorage.setItem("skipCart", JSON.stringify(skipCart));
+
+            // 🔥 คืนกลับ mainList
+            item.order = orderMap[item.id] ?? 9999;
+
+            mainList.push(item);
+            mainList.sort((a, b) => a.order - b.order);
+
+            renderList();     // รีเฟรชหน้าเบิกยา
+            renderCart();     // รีเฟรช modal
+            updateCartCount();
+        }
+
+        function removeFromCart(id) {
+
+            stopHold(); // 🔥 กันค้างซ้ำ
+
+            const index = requestCart.findIndex(i => i.id == id);
+            if (index === -1) return;
+
+            const item = requestCart[index];
+
+            // 🔥 ลบจาก cart
+            requestCart.splice(index, 1);
+            localStorage.setItem("requestCart", JSON.stringify(requestCart));
+
+            item.order = orderMap[item.id] ?? 9999;
+
+            // 🔥 คืนกลับ mainList
+            mainList.push(item);
+
+            const card = document.getElementById("card-" + item.id);
+            if (card) {
+                card.style.transform = "scale(0.95)";
+                setTimeout(() => {
+                    card.style.transform = "scale(1)";
+                }, 50);
+            }
+
+            // 🔥 เรียงใหม่ (สำคัญ!)
+            mainList.sort((a, b) => a.order - b.order);
+            renderList();
+            renderCart();
+            updateCartCount();
+        }
+
+        function changeQty(id, delta) {
+            const item = requestCart.find(i => i.id == id);
+            if (!item) return;
+
+            item.qty += delta;
+
+            if (item.qty <= 0) {
+                stopHold();   // 🔥 หยุดการกดค้างทันที
+                removeFromCart(id);
+                return;
+            }
+
+            localStorage.setItem("requestCart", JSON.stringify(requestCart));
+            renderCart();
+        }
+
+        function addItemToList(item) {
+
+            // 🔥 ถ้ายังไม่ได้เลือกประเภท → ไม่ต้องทำ
+            if (!currentType) return;
+
+            const list = document.getElementById("list");
+
+            const div = document.createElement("div");
+            div.className = "card";
+            div.id = "card-" + item.id;
+
+            div.innerHTML = `
+        <div class="item">
+        <div>
+            <div><b>${item.name}</b></div>
+            <div class="text-small">
+            หน่วย: ${item.unit} | ใช้: ${item.rate}
+            </div>
+        </div>
+        <input 
+    type="number" 
+    inputmode="numeric" 
+    pattern="[0-9]*"
+    value=""
+    placeholder="0"
+    onblur="handleInput(this, '${item.id}')">
+        </div>
+    `;
+
+            const cards = list.querySelectorAll(".card");
+
+            let inserted = false;
+
+            cards.forEach(card => {
+                const cardId = card.id.replace("card-", "");
+                const cardItem = mainList.find(i => i.id == cardId);
+
+                if (!inserted && cardItem && item.order < cardItem.order) {
+                    list.insertBefore(div, card);
+                    inserted = true;
+                }
+            });
+
+            if (!inserted) {
+                list.appendChild(div);
+            }
+
+            document.getElementById("count").innerText = `(เหลือ ${mainList.length} รายการ)`;
+        }
+
+        function showAlert(msg) {
+            document.getElementById("alertText").innerHTML = `
         <div class="alert-icon">⚠️</div>
         ${msg.replace(/\n/g, "<br>")}
       `;
-      document.getElementById("customAlert").classList.add("show");
-    }
+            document.getElementById("customAlert").classList.add("show");
+        }
 
-    function closeAlert() {
-      const alert = document.getElementById("customAlert");
-      const box = document.querySelector(".alert-box");
+        function closeAlert() {
+            const alert = document.getElementById("customAlert");
+            const box = document.querySelector(".alert-box");
 
-      box.style.animation = "popupOut 0.2s ease forwards";
+            box.style.animation = "popupOut 0.2s ease forwards";
 
-      setTimeout(() => {
-        alert.classList.remove("show");
-        box.style.animation = "";
-      }, 200);
-    }
+            setTimeout(() => {
+                alert.classList.remove("show");
+                box.style.animation = "";
+            }, 200);
+        }
 
-    function showLoading() {
-      document.getElementById("list").innerHTML = `
+        function showLoading() {
+            document.getElementById("list").innerHTML = `
         <div style="
           display:flex;
           flex-direction:column;
@@ -1218,57 +1278,57 @@
 
         </div>
       `;
-    }
+        }
 
-    function applyFontSize() {
-      document.documentElement.style.setProperty('--font-size', fontSize + 'px');
-    }
+        function applyFontSize() {
+            document.documentElement.style.setProperty('--content-font', fontSize + 'px');
+        }
 
-    function changeFont(delta) {
-      fontSize += delta;
+        function changeFont(delta) {
+            fontSize += delta;
 
-      // 🔒 จำกัดขนาด
-      if (fontSize < 18) fontSize = 18;
-      if (fontSize > 32) fontSize = 32;
+            // 🔒 จำกัดขนาด
+            if (fontSize < 18) fontSize = 18;
+            if (fontSize > 32) fontSize = 32;
 
-      localStorage.setItem("fontSize", fontSize);
-      applyFontSize();
-    }
+            localStorage.setItem("fontSize", fontSize);
+            applyFontSize();
+        }
 
-    function showSaveLoading() {
-      const div = document.createElement("div");
-      div.id = "saveLoading";
-      div.className = "save-loading";
+        function showSaveLoading() {
+            const div = document.createElement("div");
+            div.id = "saveLoading";
+            div.className = "save-loading";
 
-      div.innerHTML = `
-    <div class="loader"></div>
-    <div class="save-loading-text">
-      กำลังบันทึกรายการเบิก...
-    </div>
-  `;
+            div.innerHTML = `
+            <div class="loader"></div>
+            <div class="save-loading-text">
+            กำลังบันทึกรายการเบิก...
+            </div>
+        `;
 
-      document.body.appendChild(div);
-    }
+            document.body.appendChild(div);
+        }
 
-    function hideSaveLoading() {
-      const el = document.getElementById("saveLoading");
-      if (el) el.remove();
-    }
+        function hideSaveLoading() {
+            const el = document.getElementById("saveLoading");
+            if (el) el.remove();
+        }
 
-    // 🔥 โหลด cart จาก localStorage
-    requestCart = JSON.parse(localStorage.getItem("requestCart") || "[]");
-    skipCart = JSON.parse(localStorage.getItem("skipCart") || "[]");
+        // 🔥 โหลด cart จาก localStorage
+        requestCart = JSON.parse(localStorage.getItem("requestCart") || "[]");
+        skipCart = JSON.parse(localStorage.getItem("skipCart") || "[]");
 
-    // update UI
-    updateCartCount();
+        // update UI
+        updateCartCount();
 
-    // =====================
-    // 🚀 START
-    // =====================
-    init();
-    // loadData('tablet');
+        // =====================
+        // 🚀 START
+        // =====================
+        init();
+        // loadData('tablet');
 
-  </script>
+    </script>
 </body>
 
 </html>
