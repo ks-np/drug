@@ -674,7 +674,7 @@
         let mainList = [];
         let requestCart = [];
         let skipCart = [];
-        let userId = "";
+        let userId = "U9037c194fd875643bc1f0aba6ec349d7";
         let currentType = null;
         let currentCartTab = "request"; // request | skip
         let isTouch = false;
@@ -699,7 +699,7 @@
         // 🔐 LIFF (ใช้ตอน production)
         // =====================
         async function initLIFF() {
-            await liff.init({ liffId: "YOUR_LIFF_ID" });
+            await liff.init({ liffId: "2009544416-0nkT1Nxi" });
 
             if (!liff.isLoggedIn()) {
                 liff.login();
