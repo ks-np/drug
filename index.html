@@ -689,11 +689,10 @@
         // =====================
         // 🚀 INIT
         // =====================
-        function init() {
+        async function init() {
+            await initLIFF(); // 🔥 ต้อง await
             showTypeSelector();
-            initLIFF(); // เปิดตอนใช้จริง
         }
-
 
         // =====================
         // 🔐 LIFF (ใช้ตอน production)
@@ -707,6 +706,8 @@
 
             const profile = await liff.getProfile();
             userId = profile.userId;
+
+            console.log("USER ID:", userId); // 🔥 debug
         }
 
 
@@ -921,6 +922,12 @@
 
             const sortedRequest = [...requestCart].sort((a, b) => a.order - b.order);
             const sortedSkip = [...skipCart].sort((a, b) => a.order - b.order);
+
+            if (!userId) {
+                showAlert("⚠️ ไม่พบ userId\nกรุณาเปิดผ่าน LINE ใหม่");
+                isSaving = false;
+                return;
+            }
 
             // 🚫 กันกดซ้ำ
             if (isSaving) return;
