@@ -951,7 +951,20 @@
                     body: JSON.stringify(payload)
                 });
 
-                const result = await res.json();
+                // const result = await res.json();
+
+                // ✅ แก้เป็นแบบนี้
+                const text = await res.text();
+                let result;
+
+                try {
+                    result = JSON.parse(text);
+                } catch {
+                    console.error("Response not JSON:", text);
+                    showAlert("⚠️ ระบบตอบกลับผิดพลาด");
+                    isSaving = false;
+                    return;
+                }
 
                 console.log("RESULT:", result);
 
