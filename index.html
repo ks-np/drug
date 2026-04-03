@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <title>เบิกยา</title>
     <style>
         /* ===================== */
@@ -689,10 +690,11 @@
         // =====================
         // 🚀 INIT
         // =====================
-        async function init() {
-            await initLIFF(); // 🔥 ต้อง await
+        function init() {
             showTypeSelector();
+            initLIFF(); // เปิดตอนใช้จริง
         }
+
 
         // =====================
         // 🔐 LIFF (ใช้ตอน production)
@@ -706,8 +708,6 @@
 
             const profile = await liff.getProfile();
             userId = profile.userId;
-
-            console.log("USER ID:", userId); // 🔥 debug
         }
 
 
@@ -923,12 +923,6 @@
             const sortedRequest = [...requestCart].sort((a, b) => a.order - b.order);
             const sortedSkip = [...skipCart].sort((a, b) => a.order - b.order);
 
-            if (!userId) {
-                showAlert("⚠️ ไม่พบ userId\nกรุณาเปิดผ่าน LINE ใหม่");
-                isSaving = false;
-                return;
-            }
-
             // 🚫 กันกดซ้ำ
             if (isSaving) return;
             isSaving = true;
@@ -958,20 +952,7 @@
                     body: JSON.stringify(payload)
                 });
 
-                // const result = await res.json();
-
-                // ✅ แก้เป็นแบบนี้
-                const text = await res.text();
-                let result;
-
-                try {
-                    result = JSON.parse(text);
-                } catch {
-                    console.error("Response not JSON:", text);
-                    showAlert("⚠️ ระบบตอบกลับผิดพลาด");
-                    isSaving = false;
-                    return;
-                }
+                const result = await res.json();
 
                 console.log("RESULT:", result);
 
