@@ -169,6 +169,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 6px 0;
+            padding-right: 6px;
         }
 
         /* 🔥 ปุ่ม X */
@@ -189,7 +190,7 @@
             min-width: 0;
             font-size: 15px;
             line-height: 1.4;
-            max-width: 50%;
+            /* max-width: 50%; */
             display: flex;
             align-items: center;
             gap: 8px;
@@ -270,6 +271,10 @@
         }
 
         .remove-btn {
+            width: 30px;
+            margin-left: 12px;
+            text-align: center;
+            flex-shrink: 0;
             cursor: pointer;
             font-size: 14px;
         }
@@ -691,8 +696,8 @@
         // 🚀 INIT
         // =====================
         function init() {
+            initLIFF();
             showTypeSelector();
-            initLIFF(); // เปิดตอนใช้จริง
         }
 
 
@@ -1070,13 +1075,13 @@
                 // 🔴 ฝั่งไม่เบิก
                 else {
                     div.innerHTML = `
-        <div class="cart-row">
-          <div class="cart-left">
-            ${item.name}
-            <span class="remove-btn" onclick="undoSkip('${item.id}')">❌</span>
-          </div>
-        </div>
-      `;
+                        <div class="cart-row">
+                        <div class="cart-left">
+                            ${item.name}
+                        </div>
+                            <span class="remove-btn" onclick="undoSkip('${item.id}')">❌</span>
+                        </div>
+                    `;
                 }
 
                 list.appendChild(div);
@@ -1327,7 +1332,7 @@
         // 🚀 START
         // =====================
         init();
-        // loadData('tablet');
+        // showTypeSelector();
 
     </script>
 </body>
