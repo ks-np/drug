@@ -932,12 +932,24 @@
         // =====================
         async function submitData() {
 
+            document.querySelectorAll("input").forEach(input => input.blur());
+
             const sortedRequest = [...requestCart].sort((a, b) => a.order - b.order);
             const sortedSkip = [...skipCart].sort((a, b) => a.order - b.order);
 
             // 🚫 กันกดซ้ำ
             if (isSaving) return;
             isSaving = true;
+
+            if (!userId) {
+                showAlert("⚠️ ยังโหลด user ไม่เสร็จ");
+                return;
+            }
+
+            if (!sortedRequest || sortedRequest.length === 0) {
+                showAlert("⚠️ ไม่มีรายการเบิก");
+                return;
+            }
 
             if (mainList.length > 0) {
                 showAlert("⚠️ ยังกรอกรายการเบิกยาไม่ครบ\nไม่เบิกให้ใส่ 0");
@@ -1055,7 +1067,7 @@
 
               <div class="cart-right">   <!-- 🔥 ครอบทั้งหมด -->
                 <button 
-                  oonmousedown="startHold('${item.id}', -1, event)"
+                  onmousedown="startHold('${item.id}', -1, event)"
                   onmouseup="stopHold()" 
                   onmouseleave="stopHold()"
                   ontouchstart="startHold('${item.id}', -1, event)"
