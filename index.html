@@ -960,6 +960,9 @@
             try {
                 showSaveLoading(); // 🔥 แสดง loading
 
+                console.log("sortedRequest =", sortedRequest);
+                console.log("sortedRequest length =", sortedRequest.length);
+
                 const payload = {
                     action: "saveRequest",
                     userId: userId,
