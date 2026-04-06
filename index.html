@@ -492,6 +492,11 @@
             margin: 0 auto 10px;
         }
 
+        .btn.loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
         /* ===================== */
         /* 🎬 ANIMATION */
         /* ===================== */
@@ -629,7 +634,7 @@
         <div id="list"></div>
     </div>
 
-    <div class="cart" onclick="openCart()">
+    <div id="cartBar" class="cart" onclick="openCart()">
         <div class="cart-bar">
 
             <div class="cart-left-info">
@@ -654,8 +659,8 @@
         <h3>🛒 ตะกร้า (<span id="totalCount">0</span> รายการ)</h3>
 
         <div class="cart-tabs">
-            <div class="tab active" onclick="switchTab('request')">เบิกยา</div>
-            <div class="tab" onclick="switchTab('skip')">ไม่เบิก</div>
+            <div class="tab active" onclick="switchTab('request', event)">รายการเบิกยา</div>
+            <div class="tab" onclick="switchTab('skip', event)">รายการไม่เบิก</div>
         </div>
 
         <div id="cartList" class="cart-list"></div>
@@ -755,7 +760,7 @@
 
             } catch (err) {
                 console.error(err);
-                showAlert("⚠️ โหลดข้อมูลไม่สำเร็จ");
+                showAlert("โหลดข้อมูลไม่สำเร็จ");
             }
         }
 
@@ -773,6 +778,7 @@
       `;
 
             document.getElementById("count").innerText = "เลือกประเภทยา";
+            document.getElementById("cartBar").style.display = "none";
         }
 
 
@@ -791,11 +797,20 @@
 
                 // ❌ ถ้าคนละประเภท → ห้ามเข้า
                 if (cartType !== type) {
-                    showAlert("⚠️ ไม่สามารถเปลี่ยนประเภทยาได้\nเนื่องจากมีรายการในตะกร้า");
+
+                    showConfirm(
+                        "คุณมีรายการในตะกร้าอยู่\nระบบจะพาคุณกลับไปทำรายการเดิม",
+                        () => {
+                            currentType = cartType;
+                            document.getElementById("cartBar").style.display = "block";
+                            loadData(cartType);
+                        }
+                    );
+
                     return;
                 }
 
-                // ✅ ถ้าเป็นประเภทเดียวกัน → เข้าได้เลย
+                document.getElementById("cartBar").style.display = "block";
             }
 
             currentType = type;
@@ -857,12 +872,12 @@
             const value = parseInt(input.value);
 
             if (isNaN(value)) {
-                showAlert("⚠️ กรุณากรอกตัวเลข");
+                showAlert("กรุณากรอกตัวเลข");
                 return;
             }
 
             if (value < 0) {
-                showAlert("⚠️ รายการเบิกห้ามติดลบ");
+                showAlert("รายการเบิกห้ามติดลบ");
                 return;
             }
 
@@ -917,12 +932,11 @@
             }
         }
 
-        function switchTab(type) {
+        function switchTab(type, e) {
             currentCartTab = type;
 
-            // เปลี่ยน active tab
             document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-            event.target.classList.add("active");
+            e.target.classList.add("active");
 
             renderCart();
         }
@@ -932,6 +946,7 @@
         // =====================
         async function submitData() {
 
+            // 🔥 blur input กันค้าง focus
             document.querySelectorAll("input").forEach(input => input.blur());
 
             const sortedRequest = [...requestCart].sort((a, b) => a.order - b.order);
@@ -941,27 +956,42 @@
             if (isSaving) return;
             isSaving = true;
 
+            const btn = document.querySelector(".btn");
+            if (btn) btn.classList.add("loading");
+
+            // ❗ ยังไม่ได้ userId
             if (!userId) {
-                showAlert("⚠️ ยังโหลด user ไม่เสร็จ");
-                return;
-            }
-
-            if (!sortedRequest || sortedRequest.length === 0) {
-                showAlert("⚠️ ไม่มีรายการเบิก");
-                return;
-            }
-
-            if (mainList.length > 0) {
-                showAlert("⚠️ ยังกรอกรายการเบิกยาไม่ครบ\nไม่เบิกให้ใส่ 0");
+                showAlert("ยังโหลด user ไม่เสร็จ");
                 isSaving = false;
+                if (btn) btn.classList.remove("loading");
+                return;
+            }
+
+            // ❗ ไม่มีรายการเบิก
+            if (!sortedRequest || sortedRequest.length === 0) {
+                showAlert("ไม่มีรายการเบิก");
+                isSaving = false;
+                if (btn) btn.classList.remove("loading");
+                return;
+            }
+
+            // ❗ ยังกรอกไม่ครบ
+            if (mainList.length > 0) {
+                showAlert("ยังกรอกรายการเบิกยาไม่ครบ\nถ้าไม่เบิกให้ใส่ 0");
+                isSaving = false;
+                if (btn) btn.classList.remove("loading");
+                return;
+            }
+
+            if (!currentType) {
+                showAlert("ไม่พบประเภทยา กรุณาเลือกใหม่");
+                isSaving = false;
+                if (btn) btn.classList.remove("loading");
                 return;
             }
 
             try {
-                showSaveLoading(); // 🔥 แสดง loading
-
-                console.log("sortedRequest =", sortedRequest);
-                console.log("sortedRequest length =", sortedRequest.length);
+                showSaveLoading(); // 🔥 loading เต็มจอ
 
                 const payload = {
                     action: "saveRequest",
@@ -974,20 +1004,19 @@
                 const res = await fetch(API_URL, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "text/plain" // 🔥 กัน CORS
+                        "Content-Type": "text/plain"
                     },
                     body: JSON.stringify(payload)
                 });
 
                 const result = await res.json();
 
-                console.log("RESULT:", result);
-
-                hideSaveLoading(); // 🔥 ซ่อน loading
+                hideSaveLoading();
 
                 if (result.status !== "success") {
                     showAlert("❌ บันทึกไม่สำเร็จ\n" + (result.message || ""));
                     isSaving = false;
+                    if (btn) btn.classList.remove("loading");
                     return;
                 }
 
@@ -1011,14 +1040,21 @@
             } catch (err) {
                 console.error(err);
 
-                hideSaveLoading(); // 🔥 ต้องซ่อนแม้ error
-                showAlert("⚠️ บันทึกไม่สำเร็จ (network error)");
+                hideSaveLoading();
+                showAlert("บันทึกไม่สำเร็จ (network error)");
             }
 
-            isSaving = false; // 🔓 ปลดล็อก
+            // 🔓 ปลดล็อกเสมอ (กันพลาด)
+            isSaving = false;
+            if (btn) btn.classList.remove("loading");
         }
 
         function openCart() {
+
+            if (!currentType) {
+                showAlert("กรุณาเลือกประเภทยาก่อน");
+                return;
+            }
 
             stopHold(); // 🔥 เคลียร์ก่อนทุกครั้ง
 
@@ -1255,12 +1291,33 @@
             document.getElementById("count").innerText = `(เหลือ ${mainList.length} รายการ)`;
         }
 
-        function showAlert(msg) {
-            document.getElementById("alertText").innerHTML = `
-        <div class="alert-icon">⚠️</div>
-        ${msg.replace(/\n/g, "<br>")}
-      `;
+        function showConfirm(msg, onConfirm) {
+
+            const box = document.querySelector(".alert-box");
+
+            // 🔥 เขียนใหม่ทั้งหมด (ไม่ใช้ +=)
+            box.innerHTML = `
+                <div class="alert-text">
+                    <div class="alert-icon">⚠️</div>
+                    ${msg.replace(/\n/g, "<br>")}
+                </div>
+
+                <div style="margin-top:10px;">
+                    <button onclick="handleConfirm()">ไปต่อ</button>
+                </div>
+            `;
+
+            window._confirmCallback = onConfirm;
+
             document.getElementById("customAlert").classList.add("show");
+        }
+
+        function handleConfirm() {
+            closeAlert();
+            if (window._confirmCallback) {
+                window._confirmCallback();
+                window._confirmCallback = null;
+            }
         }
 
         function closeAlert() {
@@ -1343,9 +1400,32 @@
             if (el) el.remove();
         }
 
+        function showAlert(msg) {
+
+            const box = document.querySelector(".alert-box");
+
+            box.innerHTML = `
+                <div class="alert-text">
+                    <div class="alert-icon">⚠️</div>
+                    ${msg.replace(/\n/g, "<br>")}
+                </div>
+
+                <button class="closeAlert" onclick="closeAlert()">ตกลง</button>
+            `;
+
+            document.getElementById("customAlert").classList.add("show");
+        }
+
         // 🔥 โหลด cart จาก localStorage
         requestCart = JSON.parse(localStorage.getItem("requestCart") || "[]");
         skipCart = JSON.parse(localStorage.getItem("skipCart") || "[]");
+
+        // 🔥 FIX: กู้ currentType จาก cart
+        if (requestCart.length > 0) {
+            currentType = requestCart[0].type;
+        } else if (skipCart.length > 0) {
+            currentType = skipCart[0].type;
+        }
 
         // update UI
         updateCartCount();
